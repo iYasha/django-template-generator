@@ -1,0 +1,61 @@
+version: '3.7'
+services:
+ postgres:
+  restart: always
+  container_name: {&CONTAINER_PREFIX&}_postgres
+  env_file:
+   - ./.docker.env
+  build:
+   context: .
+   dockerfile: dockerfiles/docker_postgres.conf
+  volumes:
+      - ./postgresql:/var/lib/postgresql/data
+  ports:
+   - "5432:5432"
+  networks:
+   {&CONTAINER_PREFIX&}_network:
+    aliases:
+     - {&CONTAINER_PREFIX&}_postgres.{&CONTAINER_PREFIX&}_network
+ django:
+  restart: always
+  container_name: {&CONTAINER_PREFIX&}_django
+  volumes:
+   - ./app:/app
+   - ./sock:/sock
+  env_file:
+   - ./.docker.env
+  build:
+   context: .
+   dockerfile: dockerfiles/docker_django.conf
+  depends_on:
+   - postgres
+  command: uwsgi --ini /etc/uwsgi.ini
+#  command: bash -c "python /app/manage.py collectstatic --noinput && python /app/manage.py makemigrations && python /app/manage.py migrate && python /app/manage.py runserver 0.0.0.0:8000"
+  ports:
+   - "8000:8000"
+  networks:
+   {&CONTAINER_PREFIX&}_network:
+    aliases:
+     - {&CONTAINER_PREFIX&}_django.{&CONTAINER_PREFIX&}_network
+ nginx:
+  restart: always
+  container_name: {&CONTAINER_PREFIX&}_nginx
+  volumes:
+   - ./app:/app
+   - ./sock:/sock
+  build:
+   context: .
+   dockerfile: dockerfiles/docker_nginx.conf
+  depends_on:
+   - django
+  ports:
+    - "8080:8000"
+    - "443:443"
+  networks:
+   {&CONTAINER_PREFIX&}_network:
+    aliases:
+     - {&CONTAINER_PREFIX&}_nginx.{&CONTAINER_PREFIX&}_network
+networks:
+  {&CONTAINER_PREFIX&}_network:
+    external:
+      name: {&CONTAINER_PREFIX&}_network
