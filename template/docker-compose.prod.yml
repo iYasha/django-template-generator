@@ -1,0 +1,58 @@
+version: '3.7'
+services:
+ postgres:
+  restart: always
+  container_name: {&CONTAINER_PREFIX&}_postgres
+  env_file:
+   - ./.docker.env
+  build:
+   context: .
+   dockerfile: dockerfiles/production/docker_postgres.conf
+  volumes:
+      - ./postgresql:/var/lib/postgresql/data
+  networks:
+   {&CONTAINER_PREFIX&}_network:
+    aliases:
+     - {&CONTAINER_PREFIX&}_postgres.{&CONTAINER_PREFIX&}_network
+ django:
+  restart: always
+  container_name: {&CONTAINER_PREFIX&}_django
+  volumes:
+   - ./app:/app
+   - ./sock:/sock
+  env_file:
+   - ./.docker.env
+  build:
+   context: .
+   dockerfile: dockerfiles/production/docker_django.conf
+  depends_on:
+   - postgres
+  command: uwsgi --ini /etc/uwsgi.ini
+  ports:
+   - "8000:8000"
+  networks:
+   {&CONTAINER_PREFIX&}_network:
+    aliases:
+     - {&CONTAINER_PREFIX&}_django.{&CONTAINER_PREFIX&}_network
+ nginx:
+  restart: always
+  container_name: {&CONTAINER_PREFIX&}_nginx
+  volumes:
+   - ./app:/app
+   - ./sock:/sock
+  build:
+   context: .
+   dockerfile: dockerfiles/production/docker_nginx.conf
+  depends_on:
+   - django
+  ports:
+    - "8080:8000"
+    - "443:443"
+  networks:
+   {&CONTAINER_PREFIX&}_network:
+    aliases:
+     - {&CONTAINER_PREFIX&}_nginx.{&CONTAINER_PREFIX&}_network
+networks:
+  {&CONTAINER_PREFIX&}_network:
+    external:
+      name: {&CONTAINER_PREFIX&}_network

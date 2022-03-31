@@ -75,11 +75,19 @@ Of course, no one template will serve all projects since your needs may be diffe
    ```
 4. Answer a few questions.
 5. Go to the project directory
-6. Build docker-compose.yml
-   ```sh
-   docker-compose up --build
+6. Run the following command
+    ```sh
+   mv ./config/postgres/pg-setup.sql.example ./config/postgres/pg-setup.sql
    ```
-7. Go to the link [http://localhost:8080/docs](http://localhost:8080/docs)
+7. Run the following command
+    ```sh
+   mv ./.docker.env.example ./.docker.env
+   ```
+8. Build docker-compose.yml
+   ```sh
+   docker-compose -f docker-compose.dev.yml up --build
+   ```
+9. Go to the link [http://localhost:8080/docs](http://localhost:8080/docs) of [http://localhost:8000/docs](http://localhost:8000/docs) if u use the develop enviroment
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

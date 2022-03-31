@@ -7,7 +7,7 @@ services:
    - ./.docker.env
   build:
    context: .
-   dockerfile: dockerfiles/docker_postgres.conf
+   dockerfile: dockerfiles/develop/docker_postgres.conf
   volumes:
       - ./postgresql:/var/lib/postgresql/data
   ports:
@@ -26,11 +26,10 @@ services:
    - ./.docker.env
   build:
    context: .
-   dockerfile: dockerfiles/docker_django.conf
+   dockerfile: dockerfiles/develop/docker_django.conf
   depends_on:
    - postgres
-  command: uwsgi --ini /etc/uwsgi.ini
-#  command: bash -c "python /app/manage.py collectstatic --noinput && python /app/manage.py makemigrations && python /app/manage.py migrate && python /app/manage.py runserver 0.0.0.0:8000"
+  command: bash -c "python /app/manage.py collectstatic --noinput && python /app/manage.py makemigrations && python /app/manage.py migrate && python /app/manage.py runserver 0.0.0.0:8000"
   ports:
    - "8000:8000"
   networks:
@@ -45,7 +44,7 @@ services:
    - ./sock:/sock
   build:
    context: .
-   dockerfile: dockerfiles/docker_nginx.conf
+   dockerfile: dockerfiles/develop/docker_nginx.conf
   depends_on:
    - django
   ports:

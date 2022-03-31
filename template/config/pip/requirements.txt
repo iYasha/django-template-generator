@@ -12,5 +12,3 @@ django-cors-headers
 drf_yasg
 django-phonenumber-field
 phonenumbers
-boto3
-django-storages

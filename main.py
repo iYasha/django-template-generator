@@ -41,11 +41,9 @@ class FileParser:
         fin = open(self._path)
         fout = open(tmp_file, 'w')
         for line in fin:
-            var = FileParser.is_variable(line)
-            if var is not None:
-                start, end = var
-                key = line[start: end].replace(self.STARTSWITH, '').strip()
-                line = line.replace(line[start:end + 2], answers.get(key))
+            if line.count(self.STARTSWITH) != 0:
+                for key in answers.keys():
+                    line = line.replace(f'{self.STARTSWITH}{key}{self.ENDSWITH}', answers[key])
             fout.write(line)
         fin.close()
         fout.close()
@@ -53,7 +51,7 @@ class FileParser:
 
 
 class DirectoryList:
-    EXTENSIONS = ('.py', '.yml', '.conf', '.sql', '.md', '.env')
+    EXTENSIONS = ('.py', '.yml', '.conf', '.sql', '.md', '.env', '.example')
 
     def __init__(self, root: str):
         self._root = root

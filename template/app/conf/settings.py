@@ -17,6 +17,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 262144000
 INSTALLED_APPS = [
     # main services
     'conf',
+    'accounts',
 
     'phonenumber_field',
     'corsheaders',
